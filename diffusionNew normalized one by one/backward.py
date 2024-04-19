@@ -8,6 +8,7 @@ import math
 import forward
 from torch.optim import Adam
 import matplotlib.pyplot as plt
+from transformers import InformerConfig, InformerModel
 
 # write the parameters values
 T = forward.T
@@ -16,6 +17,8 @@ betas = forward.linear_beta_scheadule(T)
 def show_tensor_TS(x):
     x = x[0]  # Select the first time series in the batch
     plt.plot(x)  # Display the time series
+
+
 
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model, dropout=0.1, max_len=5000):
@@ -55,8 +58,10 @@ class DenoisingNetwork(nn.Module):
         self.dense2 = nn.Linear(hidden_size2, hidden_size3)
         self.dense3 = nn.Linear(hidden_size3, hidden_size1)
         self.dropout = nn.Dropout(0.5)
-        self.transformer = nn.TransformerEncoder(nn.TransformerEncoderLayer(d_model=100, nhead=4), num_layers=2)
-        
+
+        configuration = InformerConfig(prediction_length=100)
+        self.transformer = InformerModel(configuration)
+
         self.conv2 = nn.Conv1d(64, 64 , kernel_size=3, padding=1)
         
         self.activation_gate = ActivationGate()
@@ -82,10 +87,6 @@ class DenoisingNetwork(nn.Module):
         out = self.transformer(concat)
         out = self.conv2(out)
         out = self.activation_gate(out)
-        x_res = self.conv2(self.transformer(x_res))
-        x_res = self.activation_gate(x_res)
-
-        out = F.relu(self.conv3(out + x_res))   # Add the residual connection
         out = self.conv5(out)
         return out.squeeze()
     
