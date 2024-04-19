@@ -55,7 +55,7 @@ class DenoisingNetwork(nn.Module):
         self.dense2 = nn.Linear(hidden_size2, hidden_size3)
         self.dense3 = nn.Linear(hidden_size3, hidden_size1)
         self.dropout = nn.Dropout(0.5)
-        self.transformer = nn.TransformerEncoder(nn.TransformerEncoderLayer(d_model=100, nhead=4), num_layers=2, use_nested_tensor=False)
+        self.transformer = nn.TransformerEncoder(nn.TransformerEncoderLayer(d_model=100, nhead=4), num_layers=2, enable_nested_tensor=False)
         
         self.conv2 = nn.Conv1d(64, 64 , kernel_size=3, padding=1)
         
