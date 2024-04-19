@@ -41,7 +41,7 @@ T = backward.T
 losses = []
 # Train the model
 print("Training the model...")
-for epoch in tqdm(range(epochs)):
+for epoch in range(epochs):
     print('zeubi')
     for step, batch in enumerate(slices_loader):
         optimizer.zero_grad()
