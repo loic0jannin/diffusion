@@ -59,7 +59,7 @@ class DenoisingNetwork(nn.Module):
         self.dense3 = nn.Linear(hidden_size3, hidden_size1)
         self.dropout = nn.Dropout(0.5)
 
-        self.gru = nn.GRU(input_size = 100, hidden_size = 200, num_layers = 3, batch_first=True)
+        self.gru = nn.GRU(input_size = 100, hidden_size = 100, num_layers = 3, batch_first=True)
 
         self.conv2 = nn.Conv1d(64, 64 , kernel_size=3, padding=1)
         
