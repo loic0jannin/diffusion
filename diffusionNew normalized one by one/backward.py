@@ -84,6 +84,7 @@ class DenoisingNetwork(nn.Module):
         
         # Process the concatenated output
         out = self.gru(concat)
+        print("uou",flush=True)
         out = self.conv2(out)
         out = self.activation_gate(out)
         out = self.conv5(out)
