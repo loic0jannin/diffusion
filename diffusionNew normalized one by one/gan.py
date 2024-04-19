@@ -36,8 +36,11 @@ class Generator(nn.Module):
 
 
     def forward(self, x):
-         output = self.transformer(x, past_time_features=None, past_observed_mask=None)
-         return output
+            # Create placeholder tensors for past_time_features and past_observed_mask
+        past_time_features = torch.zeros(x.size(0), self.transformer.config.context_length, self.transformer.config.num_features)
+        past_observed_mask = torch.ones(x.size(0), self.transformer.config.context_length).bool()
+        output = self.transformer(x, past_time_features, past_observed_mask)
+        return output
 
 # Define the Discriminator
 class Discriminator(nn.Module):
