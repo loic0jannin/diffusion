@@ -36,7 +36,7 @@ class Generator(nn.Module):
 
 
     def forward(self, x):
-         output = self.transformer(x)
+         output = self.transformer(x, past_time_features=None, past_observed_mask=None)
          return output
 
 # Define the Discriminator
