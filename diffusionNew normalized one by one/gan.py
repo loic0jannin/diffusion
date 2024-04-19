@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader, TensorDataset
 slices = pd.read_csv('data/slices_normalized.csv', index_col=0)
 
 # Convert the DataFrame to a numpy array, then to a PyTorch Tensor
-slices_tensor = torch.tensor(slices.values)
+slices_tensor = torch.tensor(slices.values,dtype=torch.float32)
 
 # Convert your data to a TensorDataset
 slices_dataset = TensorDataset(slices_tensor)
