@@ -24,6 +24,7 @@ batch_size = 32
 # Create a DataLoader with shuffle=True for shuffling at each epoch
 train_loader = DataLoader(slices_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
 
+N = 100
 
 # Define the Generator
 class Generator(nn.Module):
