@@ -36,8 +36,8 @@ class Generator(nn.Module):
 
 
     def forward(self, x):
-            # Create placeholder tensors for past_time_features and past_observed_mask
-        past_time_features = torch.zeros(x.size(0), self.transformer.config.context_length, self.transformer.config.num_features)
+        # Create placeholder tensors for past_time_features and past_observed_mask
+        past_time_features = torch.zeros(x.size(0), self.transformer.config.context_length, self.transformer.config.num_time_features)
         past_observed_mask = torch.ones(x.size(0), self.transformer.config.context_length).bool()
         output = self.transformer(x, past_time_features, past_observed_mask)
         return output
