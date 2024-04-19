@@ -42,7 +42,6 @@ losses = []
 # Train the model
 print("Training the model...")
 for epoch in tqdm(range(epochs)):
-    print('zeubi')
     for step, batch in enumerate(slices_loader):
         optimizer.zero_grad()
 
@@ -53,7 +52,7 @@ for epoch in tqdm(range(epochs)):
         optimizer.step()
 
         if epoch % 10 == 0 and step == 0:
-            print("Epoch {} | step {}, Loss {}".format(epoch, step, loss.item()), flush=True)
+            print("Epoch {} | Loss {}".format(epoch, loss.item()), flush=True)
             losses.append((epoch, loss.item()))
             backward.sample_plot_TS(model)        
 
