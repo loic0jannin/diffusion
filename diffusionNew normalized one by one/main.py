@@ -51,7 +51,7 @@ for epoch in tqdm(range(epochs)):
         loss.backward()
         optimizer.step()
 
-        if epoch % 10 == 0 and step == 0:
+        if epoch % 1 == 0 and step == 0:
             print("Epoch {} | Loss {}".format(epoch, loss.item()), flush=True)
             losses.append((epoch, loss.item()))
             backward.sample_plot_TS(model)        
