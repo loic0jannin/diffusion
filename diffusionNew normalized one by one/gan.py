@@ -31,7 +31,7 @@ N = 100
 class Generator(nn.Module):
     def __init__(self):
         super(Generator, self).__init__()
-        configuration = AutoformerConfig(prediction_length=100, context_length=200)  # Increase context_length
+        configuration = AutoformerConfig(prediction_length=100, context_length=100)  # Increase context_length
         self.transformer = AutoformerModel(configuration)
 
 
