@@ -123,6 +123,7 @@ for epoch in tqdm(range(500)):
         with open('losses.csv', 'a', newline='') as file:
             writer = csv.writer(file)
             writer.writerow([epoch, loss_discriminator.item(), loss_generator.item()])
+            print(f"Epoch {epoch}, Discriminator Loss: {loss_discriminator.item()}, Generator Loss: {loss_generator.item()}",flush=True)
 
 
 
