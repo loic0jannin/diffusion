@@ -59,7 +59,7 @@ class DenoisingNetwork(nn.Module):
         self.dense3 = nn.Linear(hidden_size3, hidden_size1)
         self.dropout = nn.Dropout(0.5)
 
-        self.transformer = nn.Transformer(d_model=100, nhead=4, num_encoder_layers=4, num_decoder_layers=4)
+        self.gru = nn.GRU(input_size = 100, hidden_size = 200, num_layers = 3, batch_first=True)
 
         self.conv2 = nn.Conv1d(64, 64 , kernel_size=3, padding=1)
         
@@ -83,7 +83,7 @@ class DenoisingNetwork(nn.Module):
         concat = x + t
         
         # Process the concatenated output
-        out = self.transformer(concat)
+        out = self.gru(concat)
         out = self.conv2(out)
         out = self.activation_gate(out)
         out = self.conv5(out)
