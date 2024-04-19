@@ -52,7 +52,7 @@ for epoch in tqdm(range(epochs)):
         optimizer.step()
 
         if epoch % 10 == 0 and step == 0:
-            print(f"Epoch {epoch} | step {step:03d}, Loss {loss.item()}")
+            # print(f"Epoch {epoch} | step {step:03d}, Loss {loss.item()}")
             losses.append((epoch, loss.item()))
             backward.sample_plot_TS(model)        
 
@@ -77,3 +77,6 @@ samples_df = pd.DataFrame(samples)
 
 # Save the samples to a CSV file without index
 samples_df.to_csv('data/generated_samples.csv', index=False)
+
+losses_df = pd.DataFrame(losses, columns=['epoch', 'loss'])
+losses_df.to_csv('losses/error.csv', index=False)
