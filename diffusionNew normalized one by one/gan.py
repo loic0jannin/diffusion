@@ -39,6 +39,7 @@ class Generator(nn.Module):
         )
 
     def forward(self, x):
+         x = x.float()
          output = self.model(x)
          return output
 
