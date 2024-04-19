@@ -42,6 +42,7 @@ losses = []
 # Train the model
 print("Training the model...")
 for epoch in tqdm(range(epochs)):
+    print('*****')
     for step, batch in enumerate(slices_loader):
         optimizer.zero_grad()
 
@@ -54,7 +55,10 @@ for epoch in tqdm(range(epochs)):
         if epoch % 10 == 0 and step == 0:
             print("Epoch {}| step {}, Loss {}".format(epoch, step, loss.item()))
             losses.append((epoch, loss.item()))
-            backward.sample_plot_TS(model)        
+            backward.sample_plot_TS(model) 
+
+    
+           
 
 def sample_TS(model):
     x = torch.randn(1, 100)
