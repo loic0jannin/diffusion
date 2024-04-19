@@ -76,6 +76,7 @@ for epoch in tqdm(range(epochs)):
 =======
             print("Epoch {} | step {}, Loss {}".format(epoch, step, loss.item()), flush=True)
 >>>>>>> abb909be45e06c194c2689f714951020dd04a6a2
+
             losses.append((epoch, loss.item()))
             backward.sample_plot_TS(model) 
 
