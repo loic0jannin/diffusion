@@ -8,6 +8,7 @@ from torch.autograd.variable import Variable
 import torch.nn.functional as F
 torch.autograd.set_detect_anomaly(True)
 from torch.utils.data import DataLoader, TensorDataset
+from transformers import AutoformerConfig, AutoformerModel
 
 # import the normalized slices
 slices = pd.read_csv('data/slices_normalized.csv', index_col=0)
@@ -30,16 +31,12 @@ N = 100
 class Generator(nn.Module):
     def __init__(self):
         super(Generator, self).__init__()
-        self.model = nn.Sequential(
-            nn.Linear(N, 2*N), # Input is a N slicing window
-            nn.ReLU(),
-            nn.Linear(2*N,2*N), 
-            nn.ReLU(),
-            nn.Linear(2*N, N),  # Output is N slicing window
-        )
+        configuration = AutoformerConfig(prediction_length = 100)
+        self.transformer = AutoformerModel(configuration)
+
 
     def forward(self, x):
-         output = self.model(x)
+         output = self.transformer(x)
          return output
 
 # Define the Discriminator
