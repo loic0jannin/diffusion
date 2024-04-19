@@ -42,6 +42,7 @@ losses = []
 # Train the model
 print("Training the model...")
 for epoch in tqdm(range(epochs)):
+    print('zeubi')
     for step, batch in enumerate(slices_loader):
         optimizer.zero_grad()
 
