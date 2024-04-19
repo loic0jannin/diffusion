@@ -38,6 +38,7 @@ optimizer = Adam(model.parameters(), lr=0.00001)
 epochs = 100
 T = backward.T
 
+losses = []
 # Train the model
 print("Training the model...")
 for epoch in tqdm(range(epochs)):
@@ -52,6 +53,7 @@ for epoch in tqdm(range(epochs)):
 
         if epoch % 10 == 0 and step == 0:
             print(f"Epoch {epoch} | step {step:03d}, Loss {loss.item()}")
+            losses.append((epoch, loss.item()))
             backward.sample_plot_TS(model)        
 
 def sample_TS(model):
