@@ -9,6 +9,7 @@ import forward
 from torch.optim import Adam
 import matplotlib.pyplot as plt
 
+
 # write the parameters values
 T = forward.T
 betas = forward.linear_beta_scheadule(T)
