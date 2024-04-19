@@ -54,8 +54,13 @@ T = backward.T
 losses = []
 # Train the model
 print("Training the model...")
+<<<<<<< HEAD
 for epoch in range(epochs):
     print('*****')
+=======
+for epoch in tqdm(range(epochs)):
+    print('zeubi')
+>>>>>>> abb909be45e06c194c2689f714951020dd04a6a2
     for step, batch in enumerate(slices_loader):
         optimizer.zero_grad()
 
@@ -66,7 +71,11 @@ for epoch in range(epochs):
         optimizer.step()
 
         if epoch % 10 == 0 and step == 0:
+<<<<<<< HEAD
             print("Epoch {}| step {}, Loss {}".format(epoch, step, loss.item()))
+=======
+            print("Epoch {} | step {}, Loss {}".format(epoch, step, loss.item()), flush=True)
+>>>>>>> abb909be45e06c194c2689f714951020dd04a6a2
             losses.append((epoch, loss.item()))
             backward.sample_plot_TS(model) 
 
