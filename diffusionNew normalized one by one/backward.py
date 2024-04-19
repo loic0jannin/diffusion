@@ -82,11 +82,8 @@ class DenoisingNetwork(nn.Module):
         t = t.unsqueeze(-1)
         concat = x + t
         
-        print(concat.shape)
         # Process the concatenated output
         out = self.gru(concat)
-        print(out[0].shape)
-        out = self.conv2(out[0])
         out = self.activation_gate(out)
         out = self.conv5(out)
         return out.squeeze()
