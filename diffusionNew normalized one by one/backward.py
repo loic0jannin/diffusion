@@ -8,7 +8,6 @@ import math
 import forward
 from torch.optim import Adam
 import matplotlib.pyplot as plt
-from transformers import InformerConfig, InformerModel
 
 # write the parameters values
 T = forward.T
@@ -17,8 +16,6 @@ betas = forward.linear_beta_scheadule(T)
 def show_tensor_TS(x):
     x = x[0]  # Select the first time series in the batch
     plt.plot(x)  # Display the time series
-
-
 
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model, dropout=0.1, max_len=5000):
@@ -36,7 +33,6 @@ class PositionalEncoding(nn.Module):
     def forward(self, x):
         x = x + self.pe[:x.size(0), :]
         return self.dropout(x)
-
 
 class ActivationGate(nn.Module):
     def __init__(self):
@@ -83,7 +79,7 @@ class DenoisingNetwork(nn.Module):
         concat = x + t
         
         # Process the concatenated output
-        out = self.transformer(concat)
+        out = self.transformer1(concat)
         out = self.transformer2(out)
         out = self.conv2(out)
         out = self.activation_gate(out)
