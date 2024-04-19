@@ -58,10 +58,9 @@ class DenoisingNetwork(nn.Module):
         self.dense2 = nn.Linear(hidden_size2, hidden_size3)
         self.dense3 = nn.Linear(hidden_size3, hidden_size1)
         self.dropout = nn.Dropout(0.5)
-
-        configuration = InformerConfig(prediction_length=100)
-        self.transformer = InformerModel(configuration)
-
+        self.transformer1 = nn.TransformerEncoder(nn.TransformerEncoderLayer(d_model=100, nhead=4), num_layers=2)
+        self.transformer2 = nn.TransformerDecoder(nn.TransformerDecoderLayer(d_model=100, nhead=4), num_layers=2)
+        
         self.conv2 = nn.Conv1d(64, 64 , kernel_size=3, padding=1)
         
         self.activation_gate = ActivationGate()
@@ -85,8 +84,10 @@ class DenoisingNetwork(nn.Module):
         
         # Process the concatenated output
         out = self.transformer(concat)
+        out = self.transformer2(out)
         out = self.conv2(out)
         out = self.activation_gate(out)
+        out = F.relu(self.conv3(out))   # Add the residual connection
         out = self.conv5(out)
         return out.squeeze()
     
