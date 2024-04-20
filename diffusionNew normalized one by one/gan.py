@@ -8,7 +8,6 @@ from torch.autograd.variable import Variable
 import torch.nn.functional as F
 torch.autograd.set_detect_anomaly(True)
 from torch.utils.data import DataLoader, TensorDataset
-from transformers import AutoformerConfig, AutoformerModel
 
 # import the normalized slices
 slices = pd.read_csv('data/slices_normalized.csv', index_col=0)
@@ -27,50 +26,88 @@ train_loader = DataLoader(slices_dataset, batch_size=batch_size, shuffle=True, d
 
 N = 100
 
-# Define the Generator
-class Generator(nn.Module):
-    def __init__(self):
-        super(Generator, self).__init__()
-        configuration = AutoformerConfig(prediction_length=100, context_length=100)  # Increase context_length
-        self.transformer = AutoformerModel(configuration)
-
+# define the lstm model
+class LSTMModel(nn.Module):
+    def __init__(self, input_size, hidden_size, num_layers, dropout_rate=0.2):
+        super(LSTMModel, self).__init__()
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True, dropout=dropout_rate)
+        self.fc = nn.Linear(hidden_size, 100)
 
     def forward(self, x):
-        # Create placeholder tensors for past_time_features and past_observed_mask
-        past_time_features = torch.zeros(x.size(0), self.transformer.config.context_length, self.transformer.config.num_time_features)
-        past_observed_mask = torch.ones(x.size(0), self.transformer.config.context_length).bool()
-        output = self.transformer(x, past_time_features, past_observed_mask)
+        if x.dim() == 2:
+            x = x.unsqueeze(-1)
+        batch_size = x.size(0)
+        h0 = torch.zeros(self.num_layers, batch_size, self.hidden_size).to(x.device)
+        c0 = torch.zeros(self.num_layers, batch_size, self.hidden_size).to(x.device)
+        out, _ = self.lstm(x, (c0, h0))
+        out = self.fc(out[:, -1, :])
+        return out
+
+
+class Generator(nn.Module):
+    def __init__(self, input_size, hidden_size, num_layers, dropout_rate=0.2):
+        super(Generator, self).__init__()
+        
+        # Create an instance of LSTMModel
+        self.lstm = LSTMModel(input_size, hidden_size, num_layers, dropout_rate)
+        # Convolutional layer from 1 channel to 64
+        self.conv1 = nn.Conv1d(1, 64, 1)
+        # Convolutional layer from 64 channels back to 1
+        self.conv2 = nn.Conv1d(64, 1, 1)
+
+    def forward(self, x):
+        # Pass the input through the LSTMModel
+        output = self.lstm(x)
+        # Add an extra dimension for the number of channels
+        output = output.unsqueeze(1)  # Now the shape is (batch_size, 1, seq_len)
+        first_conv = self.conv1(output)
+        second_conv = self.conv2(first_conv)
+        # Remove the channel dimension
+        output = second_conv.squeeze(1)  
         return output
 
-# Define the Discriminator
+
+
 class Discriminator(nn.Module):
-    def __init__(self):
+    def __init__(self, input_size, hidden_size, num_layers, dropout_rate=0.2):
         super(Discriminator, self).__init__()
-        self.model = nn.Sequential(
-            nn.Linear(N, 2*N),
-            nn.LeakyReLU(0.2),
-            nn.Dropout(0.3),
-            nn.Linear(2*N, N),
-            nn.LeakyReLU(0.2),
-            nn.Dropout(0.3),
-            nn.Linear(N, 1),
-            nn.Sigmoid(),
-        )
+        
+        # Create an instance of LSTMModel
+        self.lstm = LSTMModel(input_size, hidden_size, num_layers, dropout_rate)
+        # Convolutional layer from 1 channel to 64
+        self.conv1 = nn.Conv1d(1, 64, 1)
+        # Convolutional layer from 64 channels back to 1
+        self.conv2 = nn.Conv1d(64, 1, 1)
+        # funlly connected layer that match the output of the conv 2 
+        self.fc = nn.Linear(100, 1)
+        # sigmoid layer
+        self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
-         output = self.model(x)
-         return output
+        # Pass the input through the LSTMModel
+        output = self.lstm(x)
+        # Add an extra dimension for the number of channels
+        output = output.unsqueeze(1)  # Now the shape is (batch_size, 1, seq_len)
+        first_conv = self.conv1(output)
+        second_conv = self.conv2(first_conv)
+        output = self.fc(second_conv)
+        # Remove the channel dimension
+        output = output.squeeze(1)
+        output = self.sigmoid(output)
+        return output
 
 
 # Create the Generator and Discriminator
-generator = Generator()
-discriminator = Discriminator()
+generator = Generator( input_size = 1, hidden_size = 256 , num_layers = 1)
+discriminator = Discriminator( input_size = 1, hidden_size = 256 , num_layers = 1)
 
 # Define the loss function and optimizers
 criterion = nn.BCELoss()
 criterion_autoencoder = nn.MSELoss()  # Separate loss function for the autoencoder
-optimizer_discriminator = torch.optim.Adam(discriminator.parameters(), lr=0.00005)
-optimizer_generator = torch.optim.Adam(generator.parameters(), lr=0.00005)
+optimizer_discriminator = torch.optim.Adam(discriminator.parameters(), lr=0.0005)
+optimizer_generator = torch.optim.Adam(generator.parameters(), lr=0.0005)
 
 
 # Initialize the CSV file
@@ -93,7 +130,6 @@ for epoch in tqdm(range(500)):
         fake_data_set = generator(noise_data_set)
         fake_data_label = torch.zeros(batch_size, 1)
 
-
         # Creating the training samples set:
         training_data_set = torch.cat((real_data, fake_data_set)).float()
 
@@ -103,7 +139,9 @@ for epoch in tqdm(range(500)):
         # Train the discriminator:
         discriminator.zero_grad()
         output_discriminator = discriminator(training_data_set)
+
         loss_discriminator = criterion(output_discriminator, training_labels_set)
+
         loss_discriminator.backward()
         optimizer_discriminator.step()
 
